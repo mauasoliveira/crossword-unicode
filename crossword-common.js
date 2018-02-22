@@ -1,5 +1,3 @@
-
-
 /* crossword-common.js */
 
 // magic RegEx to split strings into letters
@@ -229,8 +227,14 @@ Crossword.prototype.setDirection = function (direction) {
   }
 };
 
-Crossword.prototype.addWord = function (answer, callback) {
+Crossword.prototype.addWord = function (object, callback) {
   var word = [];
+  var answer = '';
+
+  if (typeof (object) === 'string')
+    answer = object;
+  else
+    answer = object.answer;
 
   // common ligature in Arabic script
   answer = answer.replace(/لا/g, 'ﻻ');
@@ -290,7 +294,7 @@ Crossword.prototype.addWord = function (answer, callback) {
             }
           }
           if (madeFit) {
-            return callback(null, madeFit.anchor, madeFit.direction);
+            return callback(null, madeFit.anchor, madeFit.direction, object);
           }
         }
       }
@@ -309,11 +313,11 @@ Crossword.prototype.addWord = function (answer, callback) {
   if (!this.downFirst) {
     var madeFit = this.loop(word, this.startDownIn.bind(this));
     if (madeFit) {
-      return callback(null, madeFit.anchor, madeFit.direction);
+      return callback(null, madeFit.anchor, madeFit.direction, object);
     } else {
       madeFit = this.loop(word, this.startAcrossIn.bind(this));
       if (madeFit) {
-        return callback(null, madeFit.anchor, madeFit.direction);
+        return callback(null, madeFit.anchor, madeFit.direction, object);
       } else {
         noFit();
       }
@@ -321,17 +325,17 @@ Crossword.prototype.addWord = function (answer, callback) {
   } else {
     var madeFit = this.loop(word, this.startAcrossIn.bind(this));
     if (madeFit) {
-      return callback(null, madeFit.anchor, madeFit.direction);
+      return callback(null, madeFit.anchor, madeFit.direction, object);
     } else {
       madeFit = this.loop(word, this.startDownIn.bind(this));
       if (madeFit) {
-        return callback(null, madeFit.anchor, madeFit.direction);
+        return callback(null, madeFit.anchor, madeFit.direction, object);
       } else {
         noFit();
       }
     }
   }
-};
+}; // \ addWord
 
 if (typeof module === 'object') {
   module.exports = Crossword;
